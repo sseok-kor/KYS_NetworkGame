@@ -416,3 +416,15 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# Claude Code files/folders to ignore
+CLAUDE.md
+CLAUDE.local.md
+.claude/
+.claudeignore
+.claude_cache/
+.claude_temps/
+claude.log
+claude_debug.log
+claude_output/
+claude_tmp/
