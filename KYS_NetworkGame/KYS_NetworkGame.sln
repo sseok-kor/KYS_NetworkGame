@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35919.96 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KYS_NetworkGame", "KYS_NetworkGame\KYS_NetworkGame.vcxproj", "{F76830CA-51AA-4D8D-83CC-1D12C961FC70}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F76830CA-51AA-4D8D-83CC-1D12C961FC70}.Debug|x64.ActiveCfg = Debug|x64
+		{F76830CA-51AA-4D8D-83CC-1D12C961FC70}.Debug|x64.Build.0 = Debug|x64
+		{F76830CA-51AA-4D8D-83CC-1D12C961FC70}.Debug|x86.ActiveCfg = Debug|Win32
+		{F76830CA-51AA-4D8D-83CC-1D12C961FC70}.Debug|x86.Build.0 = Debug|Win32
+		{F76830CA-51AA-4D8D-83CC-1D12C961FC70}.Release|x64.ActiveCfg = Release|x64
+		{F76830CA-51AA-4D8D-83CC-1D12C961FC70}.Release|x64.Build.0 = Release|x64
+		{F76830CA-51AA-4D8D-83CC-1D12C961FC70}.Release|x86.ActiveCfg = Release|Win32
+		{F76830CA-51AA-4D8D-83CC-1D12C961FC70}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BFE97EA2-4B48-451B-8C5B-7B7A37CEA040}
+	EndGlobalSection
+EndGlobal
