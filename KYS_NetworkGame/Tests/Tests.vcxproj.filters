@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="TestHarness">
+      <UniqueIdentifier>{7e3a5f2b-9c41-4d8a-b6e0-2f5d8c9a1b34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UnitTests">
+      <UniqueIdentifier>{4c8d2e17-6b5a-4f39-9a80-d13e7f6c2a55}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch_tests.h" />
+    <ClInclude Include="TestHarness\ConcurrentHammer.h">
+      <Filter>TestHarness</Filter>
+    </ClInclude>
+    <ClInclude Include="TestHarness\UniqueIdLedger.h">
+      <Filter>TestHarness</Filter>
+    </ClInclude>
+    <ClInclude Include="TestHarness\MockJob.h">
+      <Filter>TestHarness</Filter>
+    </ClInclude>
+    <ClInclude Include="TestHarness\JobProbe.h">
+      <Filter>TestHarness</Filter>
+    </ClInclude>
+    <ClInclude Include="TestHarness\RunWithTimeout.h">
+      <Filter>TestHarness</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="pch_tests.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="SmokeTest.cpp" />
+    <ClCompile Include="TestHarness\MockJob.cpp">
+      <Filter>TestHarness</Filter>
+    </ClCompile>
+    <ClCompile Include="UnitTests\SpinLockTest.cpp">
+      <Filter>UnitTests</Filter>
+    </ClCompile>
+    <ClCompile Include="UnitTests\SRWLockTest.cpp">
+      <Filter>UnitTests</Filter>
+    </ClCompile>
+    <ClCompile Include="UnitTests\MemoryOrderTest.cpp">
+      <Filter>UnitTests</Filter>
+    </ClCompile>
+    <ClCompile Include="UnitTests\IJobContractTest.cpp">
+      <Filter>UnitTests</Filter>
+    </ClCompile>
+    <ClCompile Include="UnitTests\ObjectPoolTest.cpp">
+      <Filter>UnitTests</Filter>
+    </ClCompile>
+    <ClCompile Include="UnitTests\RingBufferTest.cpp">
+      <Filter>UnitTests</Filter>
+    </ClCompile>
+    <ClCompile Include="UnitTests\LockFreeQueueTest.cpp">
+      <Filter>UnitTests</Filter>
+    </ClCompile>
+    <ClCompile Include="UnitTests\TwoLockJobQueueTest.cpp">
+      <Filter>UnitTests</Filter>
+    </ClCompile>
+    <ClCompile Include="UnitTests\SerializationBufferTest.cpp">
+      <Filter>UnitTests</Filter>
+    </ClCompile>
+    <ClCompile Include="UnitTests\CPacketTest.cpp">
+      <Filter>UnitTests</Filter>
+    </ClCompile>
+    <ClCompile Include="UnitTests\SessionPoolTest.cpp">
+      <Filter>UnitTests</Filter>
+    </ClCompile>
+    <ClCompile Include="UnitTests\TimerTest.cpp">
+      <Filter>UnitTests</Filter>
+    </ClCompile>
+    <ClCompile Include="UnitTests\PathFinderTest.cpp">
+      <Filter>UnitTests</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ThirdParty\googletest\googletest\src\gtest-all.cc" />
+  </ItemGroup>
+</Project>

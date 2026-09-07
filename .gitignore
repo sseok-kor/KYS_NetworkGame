@@ -11,6 +11,11 @@
 *.sln.docstates
 *.env
 
+# Server config - real file has the DB password (copy from Server_Config.sample.ini and fill in)
+Server_Config.ini
+# (old name - guards a leftover local db_config.txt from being committed. removable after migration)
+db_config.txt
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
@@ -32,6 +37,10 @@ bld/
 [Oo]bj/
 [Oo]ut/
 [Ll]og/
+!**/Core/[Ll]og/
+!**/Core/[Ll]og/**
+!**/ServerApp/[Ll]og/
+!**/ServerApp/[Ll]og/**
 [Ll]ogs/
 
 # Build results on 'Bin' directories
@@ -428,3 +437,7 @@ claude.log
 claude_debug.log
 claude_output/
 claude_tmp/
+
+# Portfolio / study docs (public repo 제외)
+KYS_NetworkGame/Docs/
+KYS_NetworkGame/Architecture_Flowchart.md
