@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="Core\Memory\ObjectPool.h" />
+    <ClInclude Include="Core\Memory\ObjectPool.inl" />
+    <ClInclude Include="Core\Thread\LockFreeQueue.h" />
+    <ClInclude Include="Network\IOCP\IOCPContext.h" />
+    <ClInclude Include="Network\IOCP\IOCPServer.h" />
+    <ClInclude Include="pch_gameserver.h" />
+    <ClInclude Include="Core\Timer.h" />
+    <ClInclude Include="Core\Lifecycle\CrashDump.h" />
+    <ClInclude Include="Core\Lifecycle\GracefulShutdown.h" />
+    <ClInclude Include="Core\Log\Logger.h" />
+    <ClInclude Include="Core\Memory\RingBuffer.h" />
+    <ClInclude Include="Protocol\SerializationBuffer.h" />
+    <ClInclude Include="Types\Defines.h" />
+    <ClInclude Include="Core\Thread\SpinLock.h" />
+    <ClInclude Include="Core\Thread\SRWLockWrapper.h" />
+    <ClInclude Include="Core\Thread\IJob.h" />
+    <ClInclude Include="Core\Thread\MemoryOrder.h" />
+    <ClInclude Include="Network\IOCP\Session.h" />
+    <ClInclude Include="Network\IOCP\SessionPool.h" />
+    <ClInclude Include="Core\Memory\TlsObjectPool.h" />
+    <ClInclude Include="Core\Thread\TwoLockJobQueue.h" />
+    <ClInclude Include="Network\IOCP\INetEventHandler.h" />
+    <ClInclude Include="Core\Config\DbConfig.h" />
+    <ClInclude Include="Core\Config\ServerConfig.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Core\Thread\LockFreeQueue.cpp" />
+    <ClCompile Include="Network\IOCP\IOCPServer.cpp" />
+    <ClCompile Include="pch_gameserver.cpp" />
+    <ClCompile Include="Core\Timer.cpp" />
+    <ClCompile Include="Core\Lifecycle\CrashDump.cpp" />
+    <ClCompile Include="Core\Lifecycle\GracefulShutdown.cpp" />
+    <ClCompile Include="Core\Log\Logger.cpp" />
+    <ClCompile Include="Core\Memory\RingBuffer.cpp" />
+    <ClCompile Include="Protocol\SerializationBuffer.cpp" />
+    <ClCompile Include="Core\Thread\SpinLock.cpp" />
+    <ClCompile Include="Core\Thread\SRWLockWrapper.cpp" />
+    <ClCompile Include="Network\IOCP\Session.cpp" />
+    <ClCompile Include="Network\IOCP\SessionPool.cpp" />
+    <ClCompile Include="Network\IOCP\IOCPContext.cpp" />
+    <ClCompile Include="Core\Thread\TwoLockJobQueue.cpp" />
+    <ClCompile Include="Core\Config\ServerConfig.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Core\Memory\TlsObjectPool.inl" />
+  </ItemGroup>
+</Project>

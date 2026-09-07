@@ -1,0 +1,264 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{75aba8b8-0209-44dd-bd9e-711d4ca66cd5}</ProjectGuid>
+    <RootNamespace>ServerApp</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)Build\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)Build\Intermediate\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)Build\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)Build\Intermediate\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)Build\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)Build\Intermediate\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)Build\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)Build\Intermediate\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)GameCommon;$(SolutionDir)GameServer;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch_serverapp.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)Build\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>GameServer.lib;ws2_32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)GameCommon;$(SolutionDir)GameServer;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch_serverapp.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)Build\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>GameServer.lib;ws2_32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)ThirdParty\mysql\include;$(SolutionDir)ThirdParty\rapidyaml;$(SolutionDir)GameCommon;$(SolutionDir)GameServer;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch_serverapp.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)ThirdParty\mysql\lib\x64;$(SolutionDir)Build\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>GameServer.lib;ws2_32.lib;winmm.lib;libmysql.lib;Secur32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy /Y /D "$(SolutionDir)ThirdParty\mysql\lib\x64\*.dll" "$(OutDir)"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)ThirdParty\mysql\include;$(SolutionDir)ThirdParty\rapidyaml;$(SolutionDir)GameCommon;$(SolutionDir)GameServer;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch_serverapp.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)ThirdParty\mysql\lib\x64;$(SolutionDir)Build\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>GameServer.lib;ws2_32.lib;winmm.lib;libmysql.lib;Secur32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy /Y /D "$(SolutionDir)ThirdParty\mysql\lib\x64\*.dll" "$(OutDir)"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Game\Combat\CombatFormula.cpp" />
+    <ClCompile Include="DataBase\CsvDBProvider.cpp">
+      <!-- D-2026-06-26 이후 MySQL 단일 백엔드. char_id IDBProvider 변경으로 구 시그니처라 빌드 제외(파일은 참조용 보존). -->
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="DataBase\MySqlDBProvider.cpp" />
+    <ClCompile Include="DataBase\DBResultJob.cpp" />
+    <ClCompile Include="DataBase\DBThread.cpp" />
+    <ClCompile Include="DataBase\DBCommands.cpp" />
+    <ClCompile Include="Game\GameObject.cpp" />
+    <ClCompile Include="Game\Session\GameSession.cpp" />
+    <ClCompile Include="Game\Channel\Jobs.cpp" />
+    <ClCompile Include="Game\World\MapManager.cpp" />
+    <ClCompile Include="Monitor\MetricExporter.cpp" />
+    <ClCompile Include="Monitor\ServerMonitor.cpp" />
+    <ClCompile Include="SharedService\NameDirectoryJobs.cpp" />
+    <ClCompile Include="SharedService\CrossChannelChat.cpp" />
+    <ClCompile Include="Game\Channel\ChannelManager.cpp" />
+    <ClCompile Include="Game\Channel\Channel.cpp" />
+    <ClCompile Include="Game\Channel\ChannelWatchdog.cpp" />
+    <ClCompile Include="Network\MainServer.cpp" />
+    <ClCompile Include="Game\Item\Inventory.cpp" />
+    <ClCompile Include="Game\Item\Item.cpp" />
+    <ClCompile Include="Game\Item\GroundItem.cpp" />
+    <ClCompile Include="Game\Item\DropTable.cpp" />
+    <ClCompile Include="Game\Item\TradeState.cpp" />
+    <ClCompile Include="Game\Monster\Monster.cpp" />
+    <ClCompile Include="Game\Path\PathfinderThread.cpp" />
+    <ClCompile Include="Game\Monster\MonsterTable.cpp" />
+    <ClCompile Include="Game\Monster\SpawnTable.cpp" />
+    <ClCompile Include="Game\Player\Player.cpp" />
+    <ClCompile Include="Game\World\Map.cpp" />
+    <ClCompile Include="Game\World\Cell.cpp" />
+    <ClCompile Include="Network\LoginLinkClient.cpp" />
+    <ClCompile Include="Network\LoginLinkThread.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="pch_serverapp.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SharedService\SharedServicesThread.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Game\Combat\CombatFormula.h" />
+    <ClInclude Include="DataBase\CsvDBProvider.h" />
+    <ClInclude Include="DataBase\MySqlDBProvider.h" />
+    <ClInclude Include="DataBase\DBResult.h" />
+    <ClInclude Include="DataBase\DBThread.h" />
+    <ClInclude Include="DataBase\IDBCommand.h" />
+    <ClInclude Include="DataBase\IDBProvider.h" />
+    <ClInclude Include="DataBase\DBCommands.h" />
+    <ClInclude Include="Game\GameObject.h" />
+    <ClInclude Include="Game\Session\GameSession.h" />
+    <ClInclude Include="Game\Channel\IChannel.h" />
+    <ClInclude Include="Game\Channel\Jobs.h" />
+    <ClInclude Include="Game\World\MapManager.h" />
+    <ClInclude Include="Monitor\MetricExporter.h" />
+    <ClInclude Include="Monitor\ServerMonitor.h" />
+    <ClInclude Include="SharedService\NameDirectoryJobs.h" />
+    <ClInclude Include="SharedService\CrossChannelChat.h" />
+    <ClInclude Include="Game\Channel\ChannelManager.h" />
+    <ClInclude Include="Game\Channel\Channel.h" />
+    <ClInclude Include="Game\Channel\ChannelWatchdog.h" />
+    <ClInclude Include="Network\MainServer.h" />
+    <ClInclude Include="Game\Item\Inventory.h" />
+    <ClInclude Include="Game\Item\Item.h" />
+    <ClInclude Include="Game\Item\GroundItem.h" />
+    <ClInclude Include="Game\Item\DropTable.h" />
+    <ClInclude Include="Game\Item\TradeState.h" />
+    <ClInclude Include="Game\Monster\Monster.h" />
+    <ClInclude Include="Game\Path\PathfinderThread.h" />
+    <ClInclude Include="Game\Monster\MonsterTable.h" />
+    <ClInclude Include="Game\Monster\SpawnTable.h" />
+    <ClInclude Include="Game\Player\Player.h" />
+    <ClInclude Include="Game\World\Map.h" />
+    <ClInclude Include="Game\World\Cell.h" />
+    <ClInclude Include="Network\LoginLinkClient.h" />
+    <ClInclude Include="Network\LoginLinkThread.h" />
+    <ClInclude Include="pch_serverapp.h" />
+    <ClInclude Include="SharedService\SharedServicesThread.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GameCommon\GameCommon.vcxproj">
+      <Project>{1606c912-ca71-4495-9e68-9be629a01468}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\GameServer\GameServer.vcxproj">
+      <Project>{91c1c7d4-f617-4d64-92f1-3e88b309b668}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,0 +1,211 @@
+<Window x:Class="DataEditor.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:DataEditor.ViewModels"
+        xmlns:views="clr-namespace:DataEditor.Views"
+        Title="KYS DataEditor" Height="760" Width="1220">
+    <Window.DataContext>
+        <vm:MainViewModel/>
+    </Window.DataContext>
+
+    <!-- 키보드 단축키: Ctrl+Z=실행취소, Ctrl+Y=다시실행. 셀 편집 중엔 TextBox가 먼저 처리(텍스트 undo)하고, 편집 아닐 때 이쪽이 발동. -->
+    <Window.InputBindings>
+        <KeyBinding Modifiers="Control" Key="Z" Command="{Binding UndoCommand}"/>
+        <KeyBinding Modifiers="Control" Key="Y" Command="{Binding RedoCommand}"/>
+    </Window.InputBindings>
+
+    <Window.Resources>
+        <!-- 행 추가/삭제 비활성: 현재 라이터는 기존 줄만 표면 편집(엔티티 추가/삭제는 후속 단계).
+             셀 편집 undo 통합(BeginningEdit/CellEditEnding)은 RoutedEvent가 아니라 각 편집 그리드에 직접 부착. -->
+        <Style TargetType="DataGrid">
+            <Setter Property="CanUserAddRows" Value="False"/>
+            <Setter Property="CanUserDeleteRows" Value="False"/>
+        </Style>
+
+        <!-- 행 우클릭 "캔버스에서 보기"(더블클릭=셀편집과 충돌 회피·A+B). PlacementTarget=그 DataGrid. -->
+        <ContextMenu x:Key="CanvasNavMenu">
+            <MenuItem Header="캔버스에서 보기"
+                      Command="{Binding PlacementTarget.DataContext.ViewOnCanvasCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                      CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+        </ContextMenu>
+    </Window.Resources>
+
+    <DockPanel>
+        <ToolBar DockPanel.Dock="Top">
+            <Button Content="로드" Command="{Binding LoadCommand}" Padding="8,2"/>
+            <Button Content="검증" Command="{Binding ValidateCommand}" Padding="8,2"/>
+            <Button Content="저장" Command="{Binding SaveCommand}" Padding="8,2"/>
+            <Separator/>
+            <Button Content="실행취소" Command="{Binding UndoCommand}" Padding="8,2"/>
+            <Button Content="다시실행" Command="{Binding RedoCommand}" Padding="8,2"/>
+        </ToolBar>
+
+        <StatusBar DockPanel.Dock="Bottom">
+            <TextBlock Text="{Binding Status}"/>
+            <Separator/>
+            <TextBlock Text="{Binding ErrorCount, StringFormat='오류 {0}'}" Foreground="#C0392B"/>
+            <TextBlock Text="{Binding WarningCount, StringFormat='경고 {0}'}" Foreground="#B9770E"/>
+        </StatusBar>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="3*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- 표 데이터(6종) — 편집 가능 DataGrid. 편집 시 라이브 재검증. -->
+            <TabControl Grid.Row="0" Margin="4" SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}">
+                <TabItem Header="Maps">
+                    <DockPanel>
+                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="2">
+                            <Button Content="캔버스에서 보기" Command="{Binding ViewOnCanvasCommand}"
+                                    CommandParameter="{Binding SelectedItem, ElementName=MapsGrid}" Padding="8,1"/>
+                            <TextBlock Text="  (walkableFile 열은 읽기전용 · 우클릭으로도 캔버스 이동)" Foreground="#888" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                        </StackPanel>
+                        <DataGrid x:Name="MapsGrid" ItemsSource="{Binding Maps}" AutoGenerateColumns="True"
+                                  AutoGeneratingColumn="MapsGrid_AutoGeneratingColumn"
+                                  BeginningEdit="Grid_BeginningEdit" CellEditEnding="Grid_CellEditEnding"
+                                  PreviewMouseRightButtonDown="Grid_PreviewMouseRightButtonDown"
+                                  ContextMenu="{StaticResource CanvasNavMenu}"/>
+                    </DockPanel>
+                </TabItem>
+                <TabItem Header="Spawns">
+                    <DockPanel>
+                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="2">
+                            <Button Content="행 추가" Command="{Binding AddSpawnCommand}" Padding="8,1"/>
+                            <Button Content="선택 삭제" Command="{Binding RemoveSpawnCommand}"
+                                    CommandParameter="{Binding SelectedItem, ElementName=SpawnsGrid}" Padding="8,1" Margin="4,0,0,0"/>
+                            <Button Content="캔버스에서 보기" Command="{Binding ViewOnCanvasCommand}"
+                                    CommandParameter="{Binding SelectedItem, ElementName=SpawnsGrid}" Padding="8,1" Margin="4,0,0,0"/>
+                            <TextBlock Text="  행 추가 후 좌표/맵/종류 편집 (추가·삭제도 Ctrl+Z · 우클릭=캔버스)" Foreground="#888" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                        </StackPanel>
+                        <DataGrid x:Name="SpawnsGrid" ItemsSource="{Binding Spawns}" AutoGenerateColumns="True"
+                                  BeginningEdit="Grid_BeginningEdit" CellEditEnding="Grid_CellEditEnding"
+                                  PreviewMouseRightButtonDown="Grid_PreviewMouseRightButtonDown"
+                                  ContextMenu="{StaticResource CanvasNavMenu}"/>
+                    </DockPanel>
+                </TabItem>
+                <TabItem Header="Portals">
+                    <DockPanel>
+                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="2">
+                            <Button Content="행 추가" Command="{Binding AddPortalCommand}" Padding="8,1"/>
+                            <Button Content="선택 삭제" Command="{Binding RemovePortalCommand}"
+                                    CommandParameter="{Binding SelectedItem, ElementName=PortalsGrid}" Padding="8,1" Margin="4,0,0,0"/>
+                            <Button Content="캔버스에서 보기" Command="{Binding ViewOnCanvasCommand}"
+                                    CommandParameter="{Binding SelectedItem, ElementName=PortalsGrid}" Padding="8,1" Margin="4,0,0,0"/>
+                        </StackPanel>
+                        <DataGrid x:Name="PortalsGrid" ItemsSource="{Binding Portals}" AutoGenerateColumns="True"
+                                  BeginningEdit="Grid_BeginningEdit" CellEditEnding="Grid_CellEditEnding"
+                                  PreviewMouseRightButtonDown="Grid_PreviewMouseRightButtonDown"
+                                  ContextMenu="{StaticResource CanvasNavMenu}"/>
+                    </DockPanel>
+                </TabItem>
+                <TabItem Header="Monsters">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="2*"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <DataGrid Grid.Row="0" ItemsSource="{Binding Monsters}" AutoGenerateColumns="False"
+                                  SelectedItem="{Binding SelectedMonster}"
+                                  BeginningEdit="Grid_BeginningEdit" CellEditEnding="Grid_CellEditEnding">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="type" Binding="{Binding Type}" Width="45"/>
+                                <DataGridTextColumn Header="name" Binding="{Binding Name}" Width="90"/>
+                                <DataGridTextColumn Header="hp" Binding="{Binding Hp}" Width="60"/>
+                                <DataGridTextColumn Header="atkPower" Binding="{Binding AtkPower}" Width="70"/>
+                                <DataGridTextColumn Header="moveSpeed" Binding="{Binding MoveSpeed}" Width="80"/>
+                                <DataGridTextColumn Header="aggroRange" Binding="{Binding AggroRange}" Width="80"/>
+                                <DataGridTextColumn Header="attackRange" Binding="{Binding AttackRange}" Width="80"/>
+                                <DataGridTextColumn Header="attackCooldown" Binding="{Binding AttackCooldown}" Width="100"/>
+                                <DataGridCheckBoxColumn Header="isBoss" Binding="{Binding IsBoss}" Width="55"/>
+                                <DataGridTextColumn Header="cap" Binding="{Binding Cap}" Width="45"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="2,6,2,2">
+                            <TextBlock Text="드랍 테이블 (선택한 몬스터의 drops)" FontWeight="Bold" VerticalAlignment="Center"/>
+                            <Button Content="드랍 추가" Command="{Binding AddDropCommand}" Padding="8,1" Margin="10,0,0,0"/>
+                            <Button Content="선택 삭제" Command="{Binding RemoveDropCommand}"
+                                    CommandParameter="{Binding SelectedItem, ElementName=DropsGrid}" Padding="8,1" Margin="4,0,0,0"/>
+                        </StackPanel>
+                        <DataGrid x:Name="DropsGrid" Grid.Row="2" ItemsSource="{Binding SelectedMonster.Drops}" AutoGenerateColumns="False"
+                                  BeginningEdit="Grid_BeginningEdit" CellEditEnding="Grid_CellEditEnding">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="item (아이템 templateId)" Binding="{Binding Item}" Width="160"/>
+                                <DataGridTextColumn Header="chancePermil (천분율 1..1000)" Binding="{Binding ChancePermil}" Width="180"/>
+                                <DataGridTextColumn Header="min" Binding="{Binding Min}" Width="60"/>
+                                <DataGridTextColumn Header="max" Binding="{Binding Max}" Width="60"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </TabItem>
+                <TabItem Header="Items">
+                    <DockPanel>
+                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="2">
+                            <Button Content="행 추가" Command="{Binding AddItemCommand}" Padding="8,1"/>
+                            <Button Content="선택 삭제" Command="{Binding RemoveItemCommand}"
+                                    CommandParameter="{Binding SelectedItem, ElementName=ItemsGrid}" Padding="8,1" Margin="4,0,0,0"/>
+                        </StackPanel>
+                        <DataGrid x:Name="ItemsGrid" ItemsSource="{Binding Items}" AutoGenerateColumns="True"
+                                  BeginningEdit="Grid_BeginningEdit" CellEditEnding="Grid_CellEditEnding"/>
+                    </DockPanel>
+                </TabItem>
+                <TabItem Header="캔버스 (공간)">
+                    <DockPanel>
+                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="4">
+                            <TextBlock Text="맵:" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                            <ComboBox Width="200" ItemsSource="{Binding Maps}"
+                                      SelectedItem="{Binding SelectedMap}" DisplayMemberPath="Name"/>
+                            <TextBlock Text="도구:" VerticalAlignment="Center" Margin="14,0,6,0"/>
+                            <ComboBox Width="130" SelectedIndex="{Binding CanvasTool, Mode=TwoWay}">
+                                <ComboBoxItem Content="통행 페인트"/>
+                                <ComboBoxItem Content="선택·이동"/>
+                            </ComboBox>
+                            <TextBlock Text="  휠=줌 · 우드래그=화면이동 · 페인트=좌드래그로 벽↔통행 · 선택=스폰/포탈 좌드래그로 이동"
+                                       Foreground="#888" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                        </StackPanel>
+                        <Border BorderBrush="#CCC" BorderThickness="1" Margin="4">
+                            <views:MapCanvas x:Name="SpatialCanvas"
+                                             Dataset="{Binding Dataset}" Map="{Binding SelectedMap}"
+                                             FocusedEntity="{Binding FocusedEntity}"
+                                             Tool="{Binding CanvasTool}"
+                                             FlaggedEntities="{Binding FlaggedEntities}"/>
+                        </Border>
+                    </DockPanel>
+                </TabItem>
+            </TabControl>
+
+            <GridSplitter Grid.Row="1" Height="4" HorizontalAlignment="Stretch" Background="#DDD"/>
+
+            <!-- 검증 결과 패널 -->
+            <DockPanel Grid.Row="2" Margin="4">
+                <TextBlock DockPanel.Dock="Top" Text="검증 결과 (부팅 fail-fast 미러)" FontWeight="Bold" Margin="2,4"/>
+                <DataGrid ItemsSource="{Binding Findings}" AutoGenerateColumns="False" IsReadOnly="True"
+                          HeadersVisibility="Column" GridLinesVisibility="Horizontal"
+                          MouseDoubleClick="Finding_MouseDoubleClick">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="심각도" Binding="{Binding Severity}" Width="80"/>
+                        <DataGridTextColumn Header="분류" Binding="{Binding Category}" Width="90"/>
+                        <DataGridTextColumn Header="메시지" Binding="{Binding Message}" Width="*"/>
+                    </DataGrid.Columns>
+                    <DataGrid.RowStyle>
+                        <Style TargetType="DataGridRow">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Severity}" Value="Error">
+                                    <Setter Property="Background" Value="#FDECEA"/>
+                                    <Setter Property="Foreground" Value="#C0392B"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Severity}" Value="Warning">
+                                    <Setter Property="Background" Value="#FEF5E7"/>
+                                    <Setter Property="Foreground" Value="#B9770E"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGrid.RowStyle>
+                </DataGrid>
+            </DockPanel>
+        </Grid>
+    </DockPanel>
+</Window>

@@ -1,0 +1,133 @@
+# 몬스터 사전 (서버 전용 - 드랍률 포함이라 클라에 배포/노출하지 않음)
+# type: EMonsterType 값 (0=GOBLIN 1=ORC 2=OGRE 3=SLIME 4=FENRIR 5=WOLF 6=BEAR 7=TROLL 8=GOLEM)
+#   전 종류(0..8) 정의 필수 - 누락/중복/범위 밖이면 부팅 실패.
+# moveSpeed: 이동 속도 px/s (43..200) - SC_MONSTER_SPAWN 스냅샷으로 클라에 전달되어 종류별 속도 가능.
+#   하한 43 = 8방 대각 성분(0.7071)이 30Hz 절단으로 1px 이상 (직교 시절 하한 31 -> Phase D 8방 전환으로 43 상향).
+#   30Hz 서버 tick 의 정수 절단으로 매 tick 이동량이 하한 미만이면 0 이 되어 못 움직이는 몹이 된다 (부팅 거부).
+#   범위 밖이면 부팅 실패. (현재 데이터는 전 종류 200 - 조정은 이 파일에서.)
+# aggroRange: 시야(VIEW_RANGE 400)보다 약간 넓은 버퍼존 - 몬스터가 화면 경계서 다가옴.
+# isBoss: 보스 여부 - 리스폰에서 보스 그룹 우선 처리(안전 천장 발동 시 대비 - 정상 데이터에선 천장 비발동). isBoss=true면 cap 1 이상 필수.
+# cap: 같은 맵에 존재할 수 있는 이 종류의 최대 마릿수 (스폰 그룹 count 합과 부팅 시 대조 - 초과면 부팅 거부).
+#   0 = 상한 없음 (잡몹 기본값 - 0을 "0마리 허용"으로 읽지 않는다).
+# drops: item=items.csv templateId, chancePermil=천분율(1000=100%, 행마다 독립 추첨), min/max=수량
+monsters:
+  - name: "GOBLIN"
+    type: 0
+    hp: 50
+    atkPower: 30
+    moveSpeed: 200
+    aggroRange: 500
+    attackRange: 80
+    attackCooldown: 1.0
+    isBoss: false
+    cap: 0
+    drops:
+      - { item: 1001, chancePermil: 300, min: 1, max: 2 }
+      - { item: 4001, chancePermil: 500, min: 1, max: 3 }
+  - name: "ORC"
+    type: 1
+    hp: 70
+    atkPower: 35
+    moveSpeed: 200
+    aggroRange: 500
+    attackRange: 80
+    attackCooldown: 1.0
+    isBoss: false
+    cap: 0
+    drops:
+      - { item: 1001, chancePermil: 350, min: 1, max: 2 }
+      - { item: 2001, chancePermil: 80, min: 1, max: 1 }
+  - name: "OGRE"
+    type: 2
+    hp: 120
+    atkPower: 50
+    moveSpeed: 200
+    aggroRange: 500
+    attackRange: 90
+    attackCooldown: 1.5
+    isBoss: false
+    cap: 0
+    drops:
+      - { item: 1002, chancePermil: 250, min: 1, max: 1 }
+      - { item: 2002, chancePermil: 60, min: 1, max: 1 }
+      - { item: 3001, chancePermil: 100, min: 1, max: 1 }
+  - name: "SLIME"
+    type: 3
+    hp: 30
+    atkPower: 15
+    moveSpeed: 200
+    aggroRange: 500
+    attackRange: 70
+    attackCooldown: 1.2
+    isBoss: false
+    cap: 0
+    drops:
+      - { item: 1001, chancePermil: 400, min: 1, max: 3 }
+      - { item: 4001, chancePermil: 600, min: 1, max: 5 }
+  - name: "FENRIR"
+    type: 4
+    hp: 500
+    atkPower: 70
+    moveSpeed: 200
+    aggroRange: 500
+    attackRange: 110
+    attackCooldown: 1.5
+    isBoss: true
+    cap: 1
+    drops:
+      - { item: 2003, chancePermil: 300, min: 1, max: 1 }
+      - { item: 3003, chancePermil: 250, min: 1, max: 1 }
+      - { item: 1002, chancePermil: 800, min: 2, max: 3 }
+  - name: "WOLF"
+    type: 5
+    hp: 90
+    atkPower: 40
+    moveSpeed: 200
+    aggroRange: 500
+    attackRange: 85
+    attackCooldown: 1.0
+    isBoss: false
+    cap: 0
+    drops:
+      - { item: 4002, chancePermil: 550, min: 1, max: 2 }
+      - { item: 1001, chancePermil: 300, min: 1, max: 2 }
+  - name: "BEAR"
+    type: 6
+    hp: 150
+    atkPower: 55
+    moveSpeed: 200
+    aggroRange: 500
+    attackRange: 95
+    attackCooldown: 1.3
+    isBoss: false
+    cap: 0
+    drops:
+      - { item: 4002, chancePermil: 700, min: 2, max: 4 }
+      - { item: 3002, chancePermil: 90, min: 1, max: 1 }
+  - name: "TROLL"
+    type: 7
+    hp: 200
+    atkPower: 65
+    moveSpeed: 200
+    aggroRange: 500
+    attackRange: 100
+    attackCooldown: 1.4
+    isBoss: false
+    cap: 0
+    drops:
+      - { item: 1002, chancePermil: 300, min: 1, max: 2 }
+      - { item: 2002, chancePermil: 100, min: 1, max: 1 }
+  - name: "GOLEM"
+    type: 8
+    hp: 800
+    atkPower: 90
+    moveSpeed: 200
+    aggroRange: 500
+    attackRange: 120
+    attackCooldown: 2.0
+    isBoss: true
+    cap: 1
+    drops:
+      - { item: 4003, chancePermil: 900, min: 1, max: 2 }
+      - { item: 2003, chancePermil: 200, min: 1, max: 1 }
+      - { item: 3003, chancePermil: 180, min: 1, max: 1 }

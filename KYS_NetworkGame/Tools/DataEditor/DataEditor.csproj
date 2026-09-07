@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    KYS_NetworkGame 정적 데이터 편집 툴 (WPF 앱 계층).
+    UI(View/ViewModel)만 담고, 도메인/검증/IO는 DataEditor.Core를 참조.
+    CommunityToolkit.Mvvm은 Core를 통해 transitive로 들어온다(VM에서 사용).
+    설계: .claude/CURRENT_WORK/data-editor-design-plan.md
+  -->
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>DataEditor</RootNamespace>
+    <AssemblyName>DataEditor</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DataEditor.Core\DataEditor.Core.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="pch_gamecommon.cpp" />
+    <ClCompile Include="Protocol\CPacket.cpp" />
+    <ClCompile Include="Pathfinding\Direction.cpp" />
+    <ClCompile Include="Protocol\GamePackets.cpp" />
+    <ClCompile Include="ItemData\ItemTable.cpp" />
+    <ClCompile Include="MapData\MapTable.cpp" />
+    <ClCompile Include="Pathfinding\PathFinder.cpp" />
+    <ClCompile Include="MapData\PortalTable.cpp" />
+    <ClCompile Include="MapData\WalkableTable.cpp" />
+    <ClCompile Include="Protocol\PacketObfuscator.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch_gamecommon.h" />
+    <ClInclude Include="GameDefines.h" />
+    <ClInclude Include="Protocol\PacketHeader.h" />
+    <ClInclude Include="Protocol\PacketObfuscator.h" />
+    <ClInclude Include="Protocol\PacketType.h" />
+    <ClInclude Include="Protocol\CPacket.h" />
+    <ClInclude Include="Protocol\GamePackets.h" />
+    <ClInclude Include="CommonStructs.h" />
+    <ClInclude Include="GameTypes.h" />
+    <ClInclude Include="ItemData\ItemTable.h" />
+    <ClInclude Include="MapData\MapTable.h" />
+    <ClInclude Include="MapData\PortalTable.h" />
+    <ClInclude Include="MapData\WalkableTable.h" />
+    <ClInclude Include="Pathfinding\Direction.h" />
+    <ClInclude Include="Pathfinding\PathFinder.h" />
+  </ItemGroup>
+</Project>
