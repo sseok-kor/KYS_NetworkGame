@@ -170,6 +170,8 @@
     <ClInclude Include="Core\Timer.h" />
     <ClInclude Include="Core\Config\DbConfig.h" />
     <ClInclude Include="Core\Config\ServerConfig.h" />
+    <ClInclude Include="Core\Config\ConfigParse.h" />
+    <ClInclude Include="Core\Config\ClientConfig.h" />
     <ClInclude Include="Core\Lifecycle\CrashDump.h" />
     <ClInclude Include="Core\Lifecycle\GracefulShutdown.h" />
     <ClInclude Include="Core\Log\Logger.h" />
@@ -192,6 +194,8 @@
     <ClCompile Include="Core\Memory\RingBuffer.cpp" />
     <ClCompile Include="Core\Timer.cpp" />
     <ClCompile Include="Core\Config\ServerConfig.cpp" />
+    <ClCompile Include="Core\Config\ConfigParse.cpp" />
+    <ClCompile Include="Core\Config\ClientConfig.cpp" />
     <ClCompile Include="Core\Lifecycle\CrashDump.cpp" />
     <ClCompile Include="Core\Lifecycle\GracefulShutdown.cpp" />
     <ClCompile Include="Core\Log\Logger.cpp" />

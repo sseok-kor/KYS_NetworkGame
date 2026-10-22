@@ -72,6 +72,12 @@
     <ClCompile Include="UnitTests\PathFinderTest.cpp">
       <Filter>UnitTests</Filter>
     </ClCompile>
+    <ClCompile Include="UnitTests\ConfigParseTest.cpp">
+      <Filter>UnitTests</Filter>
+    </ClCompile>
+    <ClCompile Include="UnitTests\LoggerTest.cpp">
+      <Filter>UnitTests</Filter>
+    </ClCompile>
     <ClCompile Include="..\ThirdParty\googletest\googletest\src\gtest-all.cc" />
   </ItemGroup>
 </Project>

@@ -349,8 +349,9 @@ namespace KYS
 					const int len = FormatLine(record, line);
 					if (len <= 0) { continue; }
 
-					// 콘솔 병행 출력 (로거 스레드에서 - 호출자는 콘솔 왕복을 모른다)
-					if (static_cast<int>(record.level) <= m_echoMinLevel)
+					// 콘솔 병행 출력 (로거 스레드에서 - 호출자는 콘솔 왕복을 모른다).
+					//   SERVER 채널만 콘솔에 보인다 - USER 채널(로그인 IP, 캐릭터 생성 등 유저 행동)은 감사용 파일 전용이다.
+					if (record.channel == LogChannel::SERVER && static_cast<int>(record.level) <= m_echoMinLevel)
 					{
 						::wprintf(L"%s\n", line);
 					}
