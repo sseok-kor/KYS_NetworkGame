@@ -15,6 +15,7 @@
 #include "Protocol/GamePackets.h"
 #include "Protocol/PacketType.h"
 #include "GameDefines.h"   // PLAYER_RESPAWN_DELAY_SEC (사망 후 자동 부활 카운트다운 표시) / LOGIN_CLIENT_PORT (로그인 서버 클라 대면 포트)
+#include "Core/Config/ClientConfig.h"   // ClientConfig / LoadClientConfig (conf/Client_Config.ini - 로그인 서버 주소. GameServer.lib 공용 도구)
 
 // ImGui + DX11 백엔드.
 // 외부 라이브러리 헤더는 /W4 경고를 발생시키므로 push(0)/pop 으로 감싸
@@ -26,6 +27,8 @@
 #include <d3d11.h>
 #include <dxgi.h>
 #pragma warning(pop)
+
+#include <clocale>   // setlocale (콘솔 한글 출력 - 설정 파일 진단 메시지가 보이게. 서버 3 앱과 같은 첫 줄)
 
 // imgui_impl_win32.cpp 가 정의하는 Win32 메시지 핸들러 전방 선언.
 // imgui_impl_win32.h 는 이 선언을 #if 0 블록 안에 두어 사용자 .cpp 가 직접 선언하게 한다.
@@ -140,10 +143,26 @@ static LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 int main()
 {
+	::setlocale(LC_ALL, "");   // 콘솔 한글 출력 - 이것이 없으면 wprintf 의 한글 줄이 C 로케일에서 조용히 사라진다
+
 	// (0) Winsock 초기화
 	WSADATA wsa;
 	if (::WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
 		return 1;
+
+	// 클라 접속 설정 적재 (conf/Client_Config.ini - 로그인 서버 주소). 실패 = 종료: 붙을 주소가 없으면 GUI 는 의미가 없고,
+	//   기본값 폴백은 오설정을 숨기므로 두지 않는다(서버 3 프로세스와 같은 규칙). 사유는 로더가 콘솔에 남긴다.
+	ClientConfig clientConfig;
+	if (!LoadClientConfig(&clientConfig))
+	{
+		::MessageBoxW(nullptr, L"conf/Client_Config.ini 를 읽지 못했다.\n콘솔의 [Client_Config] 메시지를 확인한다.", L"KYS 게임 클라이언트", MB_OK | MB_ICONERROR);
+		::WSACleanup();
+		return 1;
+	}
+	// 로그인 서버 주소를 문자열로 한 번 만들어 둔다 - 접속과 계정 생성 두 자리가 이것을 쓴다 (Debug 는 입력칸이 이 값을 덮어쓴다).
+	wchar_t loginHost[64];
+	::swprintf_s(loginHost, L"%u.%u.%u.%u", (clientConfig.loginIp >> 24) & 0xFF, (clientConfig.loginIp >> 16) & 0xFF,
+		(clientConfig.loginIp >> 8) & 0xFF, clientConfig.loginIp & 0xFF);
 
 	// 공유 포탈 표 적재 (서버와 같은 Data/portals.csv). 실패해도 GUI는 뜬다(포탈만 미표시).
 	LoadPortalTable();
@@ -200,7 +219,13 @@ int main()
 	GameState       gameState;
 	PacketProcessor packetProcessor(localPlayer, gameState);
 	GameRenderer    gameRenderer;
-	char inputServerIp[64] = "127.0.0.1";
+#ifdef _DEBUG
+	// 개발 전용: 로그인 서버 주소 입력칸 버퍼(UTF-8). 초기값은 설정 파일 값이고 다른 서버(QA/LAN)에 붙을 때 고쳐 쓴다.
+	//   Release 에는 이 버퍼도 입력칸도 없다 - 배포본은 설정 파일 주소로만 붙는다.
+	char inputServerIp[64];
+	::sprintf_s(inputServerIp, "%u.%u.%u.%u", (clientConfig.loginIp >> 24) & 0xFF, (clientConfig.loginIp >> 16) & 0xFF,
+		(clientConfig.loginIp >> 8) & 0xFF, clientConfig.loginIp & 0xFF);
+#endif
 	char inputId[32] = "bot00000";
 	char inputPw[64] = "loadtest";    // 비밀번호 입력(UTF-8) - 봇 계정 기본값(데모 편의)
 	bool accountCreateOpen = false;   // true = 계정 생성 화면(연결 전 클라-로컬 토글)
@@ -767,23 +792,26 @@ int main()
 			ImGui::TextUnformatted(creating
 				? u8"새 계정을 만듭니다 (id + 비밀번호)."
 				: u8"게임 서버에 2단계로 접속합니다 (로그인 서버 -> 토큰 -> 게임 서버).");
-			ImGui::InputText(u8"서버 IP", inputServerIp, sizeof(inputServerIp));
+#ifdef _DEBUG
+			ImGui::InputText(u8"서버 IP", inputServerIp, sizeof(inputServerIp));   // 개발 전용 - Release 화면에는 주소가 없다
+#endif
 			ImGui::InputText(u8"계정 ID", inputId, sizeof(inputId));
 			ImGui::InputText(u8"비밀번호", inputPw, sizeof(inputPw), ImGuiInputTextFlags_Password);
 			if (!creating)
 			{
 				if (ImGui::Button(u8"접속 (2단계 로그인)"))
 				{
-					wchar_t wip[64];
 					wchar_t wid[32];
 					wchar_t wpw[64];
-					ToWide(inputServerIp, wip, 64);
+#ifdef _DEBUG
+					ToWide(inputServerIp, loginHost, 64);   // 개발 전용 - 입력칸 값이 설정 파일 주소를 덮어쓴다
+#endif
 					ToWide(inputId, wid, 32);
 					ToWide(inputPw, wpw, 64);
 					// (1) 토큰 획득 -> (2) 게임 서버 접속. 게임 서버 주소는 로그인 서버가 SC_LOGIN_TOKEN 에 실어
 					//   반드시 하달한다 - 클라가 입력 IP 로 대신 붙는 폴백은 없다(rip == 0 이면 서버 오설정).
 					bool gameAddressMissing = false;   // 토큰은 받았는데 게임 서버 주소가 비어 있었다 (아래 실패 메시지 분기용)
-					bool ok = clientSocket.AcquireToken(wip, LOGIN_CLIENT_PORT, wid, wpw);
+					bool ok = clientSocket.AcquireToken(loginHost, LOGIN_CLIENT_PORT, wid, wpw);
 					if (ok)
 					{
 						const UINT32 rip = clientSocket.GetRedirectIp();
@@ -824,14 +852,15 @@ int main()
 			{
 				if (ImGui::Button(u8"만들기"))
 				{
-					wchar_t wip[64];
 					wchar_t wid[32];
 					wchar_t wpw[64];
-					ToWide(inputServerIp, wip, 64);
+#ifdef _DEBUG
+					ToWide(inputServerIp, loginHost, 64);   // 개발 전용 - 입력칸 값이 설정 파일 주소를 덮어쓴다
+#endif
 					ToWide(inputId, wid, 32);
 					ToWide(inputPw, wpw, 64);
 					BYTE result = 0;
-					const bool reached = clientSocket.RegisterAccount(wip, LOGIN_CLIENT_PORT, wid, wpw, result);
+					const bool reached = clientSocket.RegisterAccount(loginHost, LOGIN_CLIENT_PORT, wid, wpw, result);
 					if (!reached)
 						::strcpy_s(statusMsg, u8"계정 생성 실패 (로그인 서버 응답 없음).");
 					else if (result == static_cast<BYTE>(ECreateAccountResult::OK))
@@ -894,7 +923,6 @@ int main()
 				ImGui::TextUnformatted(u8"채널 목록 대기 중...");
 			}
 			ImGui::Separator();
-			ImGui::Text(u8"토큰       : 0x%016llX", clientSocket.GetToken());
 			ImGui::Text(u8"수신 패킷 수 : %lld", clientSocket.GetRecvPackets());
 			ImGui::Text(u8"수신 바이트  : %lld", clientSocket.GetRecvBytes());
 			ImGui::Text(u8"마지막 종류  : 0x%04X", static_cast<unsigned int>(clientSocket.GetLastPacketType()));

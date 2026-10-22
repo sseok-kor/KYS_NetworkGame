@@ -1,18 +1,24 @@
 ﻿#include "pch_gameserver.h"
 #include "Core/Config/ServerConfig.h"
+#include "Core/Config/ConfigParse.h"   // Trim / SkipUtf8Bom / OpenConfigFile / ParseU32 / ParseIpv4 / AppendMissingKey / ReportError (클라 로더와 공용)
 
-#include <cstdio>      // _wfopen_s / fgets / fclose / FILE
-#include <cstring>     // strncpy_s / strcmp / strlen / strchr
-#include <cstdlib>     // strtoul / _countof
-#include <cerrno>      // errno / ERANGE (ParseU32 오버플로 감지)
-#include <cwchar>      // wcsrchr / swprintf_s / wcsncat_s
+#include <cstdio>      // fgets / fclose / FILE
+#include <cstring>     // strncpy_s / strcmp / strchr
+#include <cstdlib>     // _countof
 
 namespace
 {
-	const int CONFIG_LINE_MAX = 256;                            // 한 줄 최대 바이트(key=value + 여유)
 	const wchar_t* const CONFIG_TAG  = L"[Server_Config] ";     // 콘솔 진단 접두어 - 부팅 로그에서 설정 관련 줄만 눈으로 걸러낸다
-	const wchar_t* const CONFIG_DIR  = L"conf";                 // 전용 설정 폴더
 	const wchar_t* const CONFIG_FILE = L"Server_Config.ini";
+
+	// 줄 다듬기 / 폴더 탐색 / 값 검증은 클라 로더(ClientConfig)와 한 벌을 나눠 쓴다 - ConfigParse.h
+	using KYS::GAMESERVER::CONFIG::CONFIG_LINE_MAX;
+	using KYS::GAMESERVER::CONFIG::Trim;
+	using KYS::GAMESERVER::CONFIG::SkipUtf8Bom;
+	using KYS::GAMESERVER::CONFIG::OpenConfigFile;
+	using KYS::GAMESERVER::CONFIG::ParseU32;
+	using KYS::GAMESERVER::CONFIG::ParseIpv4;
+	using KYS::GAMESERVER::CONFIG::AppendMissingKey;
 
 	// 현재 읽고 있는 줄이 어느 섹션에 속하는가. 파일의 [database]/[server]/[interserver] 헤더가 이 값을 바꾼다.
 	enum ESection
@@ -24,147 +30,11 @@ namespace
 		SECTION_UNKNOWN        // 우리가 모르는 [섹션] - 다음 헤더까지 통째로 건너뛴다
 	};
 
-	// 설정 진단을 콘솔에 남긴다. 이 로더는 서버 2앱과 봇이 함께 쓰므로 특정 앱 로거에 묶지 않고
-	//   양쪽 다 보이는 wprintf 를 쓴다 (부팅 시점이라 콘솔 가시성 충분. 서버 fatal 파일 로그는 main 이 별도).
+	// 이 파일의 진단은 전부 [Server_Config] 접두어 - 공용 ReportError 에 태그를 고정해 부른다.
 	template <typename... Args>
 	void ReportError(const wchar_t* fmt, Args... args)
 	{
-		wprintf(L"%s", CONFIG_TAG);
-		wprintf(fmt, args...);
-		wprintf(L"\n");
-	}
-
-	// 문자열 앞뒤 공백/개행 제거 후 시작 포인터 반환(끝은 널 삽입). in-place.
-	char* Trim(char* s)
-	{
-		while (*s == ' ' || *s == '\t') { ++s; }   // 앞 공백
-		char* end = s + strlen(s);
-		while (end > s && (end[-1] == ' ' || end[-1] == '\t' || end[-1] == '\r' || end[-1] == '\n'))
-		{
-			--end;
-		}
-		*end = '\0';
-		return s;
-	}
-
-	// 파일 선두 UTF-8 BOM(EF BB BF)을 벗긴다 - 에디터가 붙였을 때 첫 줄 [database] 가 형식 오류로 오진되는 것 방지.
-	//   첫 줄에만 적용한다. 중간 줄에 나온 BOM 은 진짜 형식 오류다.
-	char* SkipUtf8Bom(char* s)
-	{
-		if (static_cast<unsigned char>(s[0]) == 0xEF && static_cast<unsigned char>(s[1]) == 0xBB &&
-			static_cast<unsigned char>(s[2]) == 0xBF)
-		{
-			return s + 3;
-		}
-		return s;
-	}
-
-	// 파일을 못 찾았을 때 "여기와 여기를 봤다"고 말하기 위해 시도한 절대경로를 한 줄씩 쌓아 둔다.
-	void AppendTriedPath(wchar_t* outTried, size_t triedCap, const wchar_t* path)
-	{
-		wcsncat_s(outTried, triedCap, CONFIG_TAG, _TRUNCATE);
-		wcsncat_s(outTried, triedCap, L"  ", _TRUNCATE);
-		wcsncat_s(outTried, triedCap, path, _TRUNCATE);
-		wcsncat_s(outTried, triedCap, L"\n", _TRUNCATE);
-	}
-
-	// (1) <exe 폴더>\conf\ (2) <작업 폴더>\conf\ 순으로 찾는다.
-	//   두 후보 모두 절대경로로 만들어 outTried 에 남긴다 - 실패 메시지가 "설정이 없다"가 아니라
-	//   "여기와 여기를 봤는데 없다"가 되어야 배포/작업폴더 사고를 즉시 진단할 수 있다.
-	FILE* OpenConfigFile(wchar_t* outTried, size_t triedCap)
-	{
-		outTried[0] = L'\0';
-
-		wchar_t candidate[MAX_PATH * 2];
-
-		wchar_t exePath[MAX_PATH];
-		const DWORD exeLen = ::GetModuleFileNameW(nullptr, exePath, MAX_PATH);
-		if (exeLen > 0 && exeLen < _countof(exePath))
-		{
-			wchar_t* lastSlash = wcsrchr(exePath, L'\\');
-			if (lastSlash != nullptr)
-			{
-				lastSlash[1] = L'\0';   // 파일명을 잘라 폴더 경로만 남긴다(끝에 역슬래시 유지)
-				swprintf_s(candidate, _countof(candidate), L"%s%s\\%s", exePath, CONFIG_DIR, CONFIG_FILE);
-				AppendTriedPath(outTried, triedCap, candidate);
-
-				FILE* fp = nullptr;
-				if (_wfopen_s(&fp, candidate, L"rt") == 0 && fp != nullptr) { return fp; }
-			}
-		}
-
-		wchar_t workDir[MAX_PATH];
-		const DWORD workLen = ::GetCurrentDirectoryW(MAX_PATH, workDir);
-		if (workLen > 0 && workLen < _countof(workDir))
-		{
-			swprintf_s(candidate, _countof(candidate), L"%s\\%s\\%s", workDir, CONFIG_DIR, CONFIG_FILE);
-			AppendTriedPath(outTried, triedCap, candidate);
-
-			FILE* fp = nullptr;
-			if (_wfopen_s(&fp, candidate, L"rt") == 0 && fp != nullptr) { return fp; }
-		}
-
-		return nullptr;
-	}
-
-	// 전량 소비 검사 - 값 전체가 숫자여야 한다. "7777x" 같은 부분 파싱을 거부한다.
-	//   base = 10 이면 10진만, 0 이면 진법 자동 판별(0x..=16진 / 0..=8진).
-	//   진법 자동 판별이 필요한 키는 secret 하나뿐이다. 포트에 base 0 을 쓰면 "07777" 이 8진 4095 로
-	//   조용히 바뀌므로(전량 소비 검사를 통과한다) 포트는 반드시 base 10 으로 부른다.
-	bool ParseU32(const char* val, UINT32* out, int base)
-	{
-		if (val == nullptr || val[0] == '\0') { return false; }   // 빈 값 = 키를 쓰다 만 것
-		if (val[0] == '+' || val[0] == '-') { return false; }     // 부호는 형식 오류 - strtoul 은 "-1" 을 4294967295 로 되돌리고 전량 소비까지 만족시켜, 그대로 두면 secret=-1 이 non-zero 검증을 통과한다
-		char* end = nullptr;
-		errno = 0;                                                // 오버플로 감지 준비 - strtoul 은 범위를 넘으면 ULONG_MAX 를 돌려주면서 전량 소비도 만족시킨다
-		const unsigned long v = strtoul(val, &end, base);
-		if (end == val || *end != '\0') { return false; }         // 한 글자도 못 읽었거나, 뒤에 뭔가 남았다
-		if (errno == ERANGE) { return false; }                    // 32비트 범위 초과 - 적어 둔 값과 다른 값이 쓰이는 것을 막는다
-		*out = static_cast<UINT32>(v);
-		return true;
-	}
-
-	// 점표기 IPv4 -> host-order UINT32. 계약 3가지:
-	//   (1) 정확히 4옥텟   (2) 각 옥텟 0..255   (3) 문자열 전량 소비(뒤 문자/5번째 그룹 불허)
-	// sscanf_s 를 쓰지 않는 이유 = 반환값이 "몇 개 읽었는가"라서 "127.0.0.1x" 와 "1.2.3.4.5" 가 둘 다 4 를 준다.
-	//   outReason = 거부 사유 문구. 진단 메시지가 세 계약 중 어느 것을 어겼는지 그대로 말하게 한다.
-	bool ParseIpv4(const char* val, UINT32* out, const wchar_t** outReason)
-	{
-		*outReason = L"점표기 a.b.c.d 가 아니다";
-		if (val == nullptr) { return false; }
-
-		UINT32 addr = 0;
-		const char* cur = val;
-		for (int i = 0; i < 4; ++i)
-		{
-			if (*cur < '0' || *cur > '9') { return false; }        // 옥텟은 반드시 숫자로 시작(공백/부호/빈칸 거부)
-
-			char* end = nullptr;
-			const unsigned long octet = strtoul(cur, &end, 10);     // base 10 고정 - "010" 을 8진으로 읽지 않는다
-			if (end == cur) { return false; }
-			if (octet > 255)
-			{
-				*outReason = L"각 옥텟은 0..255 여야 한다";
-				return false;
-			}
-
-			addr = (addr << 8) | static_cast<UINT32>(octet);
-			cur = end;
-
-			if (i < 3)
-			{
-				if (*cur != '.') { return false; }                  // 옥텟 사이에는 점이 정확히 하나
-				++cur;
-			}
-		}
-		if (*cur != '\0')
-		{
-			*outReason = L"값 뒤에 남은 문자가 있다";                // "127.0.0.1x" 와 "1.2.3.4.5" 를 여기서 거부
-			return false;
-		}
-
-		*out = addr;
-		return true;
+		KYS::GAMESERVER::CONFIG::ReportError(CONFIG_TAG, fmt, args...);
 	}
 
 	// 진단 메시지에 찍을 섹션 이름.
@@ -184,24 +54,6 @@ namespace
 	void WarnUnknownKey(ESection section, const char* key)
 	{
 		ReportError(L"%s 섹션의 알 수 없는 키 - 무시한다 (key: \"%hs\")", SectionName(section), key);
-	}
-
-	// 누락 필수 키를 "[database] user, password / [server] public_port" 형태로 이어 붙인다.
-	//   sectionOpen = 이 섹션에서 이미 한 키를 적었는가(호출측 지역 변수). 구분자를 ", " 로 할지 " / " 로 할지 가른다.
-	void AppendMissingKey(wchar_t* out, size_t cap, const wchar_t* section, const wchar_t* key, bool* sectionOpen)
-	{
-		if (*sectionOpen)
-		{
-			wcsncat_s(out, cap, L", ", _TRUNCATE);
-		}
-		else
-		{
-			if (out[0] != L'\0') { wcsncat_s(out, cap, L" / ", _TRUNCATE); }
-			wcsncat_s(out, cap, section, _TRUNCATE);
-			wcsncat_s(out, cap, L" ", _TRUNCATE);
-			*sectionOpen = true;
-		}
-		wcsncat_s(out, cap, key, _TRUNCATE);
 	}
 }
 
@@ -228,7 +80,7 @@ bool LoadServerConfig(DbConfig* outDb, ServerConfig* outServer, InterServerConfi
 	}
 
 	wchar_t tried[MAX_PATH * 4];
-	FILE* fp = OpenConfigFile(tried, _countof(tried));
+	FILE* fp = OpenConfigFile(CONFIG_FILE, CONFIG_TAG, tried, _countof(tried));
 	if (fp == nullptr)
 	{
 		ReportError(L"파일을 찾을 수 없다 - 다음 위치를 확인했다:");

@@ -201,6 +201,8 @@
     <ClCompile Include="UnitTests\SessionPoolTest.cpp" />
     <ClCompile Include="UnitTests\TimerTest.cpp" />
     <ClCompile Include="UnitTests\PathFinderTest.cpp" />
+    <ClCompile Include="UnitTests\ConfigParseTest.cpp" />
+    <ClCompile Include="UnitTests\LoggerTest.cpp" />
     <ClCompile Include="..\ThirdParty\googletest\googletest\src\gtest-all.cc">
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <AdditionalIncludeDirectories>$(SolutionDir)ThirdParty\googletest\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>

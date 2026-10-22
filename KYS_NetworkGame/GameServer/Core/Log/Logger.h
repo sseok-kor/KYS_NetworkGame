@@ -54,7 +54,7 @@ namespace KYS
 
 			// 비동기 로거 (lock 기반).
 			//   - 생산자(채널/DB/워커/main 등 아무 스레드): 레벨 필터 -> 스택 로컬 조립 -> 락 안 memcpy commit -> 이벤트 신호. 파일 I/O 를 기다리지 않는다.
-			//   - 소비자(전용 로거 스레드 1개): 배치로 꺼내 UTF-8 변환 후 채널별 파일에 쓰고, 설정 레벨 이상은 콘솔에도 병행 출력.
+			//   - 소비자(전용 로거 스레드 1개): 배치로 꺼내 UTF-8 변환 후 채널별 파일에 쓰고, SERVER 채널의 설정 레벨 이상만 콘솔에도 병행 출력(USER 채널은 파일 전용).
 			//   - 큐가 가득 차면 새 로그를 버리고 GetDropCount 로 관측한다 (생산자는 절대 기다리지 않는다 - tick 스레드 보호).
 			//   - LL_FATAL 은 큐를 우회해 호출 스레드가 파일에 직접 동기 기록(유한 락 시도 - 실패해도 콘솔 출력과 abort 진행을 막지 않음).
 			//   - 라이브러리(GameServer.lib) 내부 코드는 이 로거를 호출하지 않는다. 위치만 공용 라이브러리고 호출은 전부 앱 몫이다.
@@ -75,7 +75,7 @@ namespace KYS
 				void Shutdown();
 
 				void SetLogLevel(LogLevel level);             // 이 레벨보다 덜 중요한 로그는 접수 자체를 버린다 (기본 LL_INFO)
-				void SetConsoleEchoMinLevel(LogLevel level);  // 콘솔 병행 출력의 최소 중요도 (모니터 모드 중에는 LL_WARN 으로 올려 화면 간섭을 줄인다)
+				void SetConsoleEchoMinLevel(LogLevel level);  // 콘솔 병행 출력의 최소 중요도 - SERVER 채널에만 적용 (모니터 모드 중에는 LL_WARN 으로 올려 화면 간섭을 줄인다)
 
 				// 로그 한 건 기록. tag 는 짧은 분류어(boot/db/login/leave 등), format 은 wprintf 계열 서식.
 				//   레벨 필터가 포맷보다 앞이라 꺼진 로그는 비용이 없다. 본문이 LOG_TEXT_MAX 를 넘으면 절단하고 카운트한다.

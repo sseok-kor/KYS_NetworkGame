@@ -45,7 +45,6 @@ public:
 	// 송신 중 실제 에러 발생 여부를 소비(읽고 클리어). armed send 가 실패하면 send 키만 advance 되고 패킷은 안 나가 서버 recv 키와 영구 desync 되므로,
 	// main 이 매 프레임 이 값을 확인해 연결을 내린다(재접속이 무장 리셋 + 다음 arm 재seed 로 키 복구). recv 가 멀쩡해도 끊어야 하는 케이스.
 	bool               TakeSendFailed() { const bool failed = m_sendFailed; m_sendFailed = false; return failed; }
-	unsigned long long GetToken() const { return m_token; }
 	UINT32             GetRedirectIp() const { return m_redirectIp; }     // 로그인 서버가 알려준 게임 서버 IP(호스트 정수) - 이 주소로만 ConnectGame 한다. 0 = 서버 오설정(폴백 없음)
 	USHORT             GetRedirectPort() const { return m_redirectPort; } // 로그인 서버가 알려준 게임 서버 포트
 	long long          GetRecvBytes() const { return m_recvBytesTotal; }

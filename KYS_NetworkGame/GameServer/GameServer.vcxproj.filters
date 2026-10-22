@@ -25,6 +25,8 @@
     <ClInclude Include="Network\IOCP\INetEventHandler.h" />
     <ClInclude Include="Core\Config\DbConfig.h" />
     <ClInclude Include="Core\Config\ServerConfig.h" />
+    <ClInclude Include="Core\Config\ConfigParse.h" />
+    <ClInclude Include="Core\Config\ClientConfig.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Thread\LockFreeQueue.cpp" />
@@ -43,6 +45,8 @@
     <ClCompile Include="Network\IOCP\IOCPContext.cpp" />
     <ClCompile Include="Core\Thread\TwoLockJobQueue.cpp" />
     <ClCompile Include="Core\Config\ServerConfig.cpp" />
+    <ClCompile Include="Core\Config\ConfigParse.cpp" />
+    <ClCompile Include="Core\Config\ClientConfig.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Core\Memory\TlsObjectPool.inl" />
